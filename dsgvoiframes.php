@@ -75,38 +75,55 @@ class PlgContentDsgvoiframes extends JPlugin {
                 $iconFile = $urlCommonPart . '.svg';
             }
             $iconPath = $iconFolder . $iconFile;
-            $wa->addInlineStyle('
-                #dsgvo-iframe-container-'.$random.' {
-                    width: '.$iframeWidth.';
-                    height: '.$iframeHeight.';
-                }');
 
             $replacement = <<<HTML
                 <div id="dsgvo-iframe-container-$random" class="dsgvo-iframe-container fake-iframe">
                     <img width="60" height="auto" src="$iconPath" alt="">
                     <p>Mit dem Klick auf den folgenden Button lade ich bewusst Inhalte von der externen Website: $iframeSrcUrl.</p>
+                    <p>
+                        <input type="checkbox" id="dsgvo-iframe-checkbox-$iframeSrcUrl" name="loadAlways">
+                        <label for="dsgvo-iframe-checkbox-$iframeSrcUrl">Inhalte von $iframeSrcUrl immer laden?</label>
+                    </p>
                     <button class="button">
                         Inhalte von $iframeSrcUrl laden
                     </button>
                 </div>
+                <script>
+                    function getCookie (name) {
+                        let value = `; \${document.cookie}`;
+                        let parts = value.split(`; \${name}=`);
+                        if (parts.length === 2) return parts.pop().split(';').shift();
+                    }
+                    document.addEventListener( 'DOMContentLoaded', function() {
+                        document.getElementById('dsgvo-iframe-container-$random').style.height = document.getElementById('dsgvo-iframe-container-$random').offsetWidth / 16 * 9 + 'px';
+                        let expiryDate = new Date();
+                        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+                        if ( getCookie('dsgvoIframe-$iframeSrcUrl') === 'true' ) {
+                            loadIframe$random();
+                        } else {
+                            const checkBox = document.getElementById('dsgvo-iframe-checkbox-$iframeSrcUrl');
+                            checkBox.addEventListener('click', function() {
+                                document.cookie = "dsgvoIframe-$iframeSrcUrl=true;path=/;max-age=31536000;"
+                                loadIframe$random();
+                            } );
+                        }
+                    } );
+                    let loadIframe$random = function() {
+                        const iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', '$iframeSrc');
+                        iframe.style.width = '$iframeWidth';
+                        iframe.title = '$iframeTitle';
+                        document.getElementById('dsgvo-iframe-container-$random').after(iframe);
+                        document.getElementById('dsgvo-iframe-container-$random').nextElementSibling.style.height = document.getElementById('dsgvo-iframe-container-$random').offsetWidth / 16 * 9 + 'px';
+                        document.getElementById('dsgvo-iframe-container-$random').remove();
+                    };
+                </script>
+                <style>
+                    #dsgvo-iframe-container-$random {
+                        width: $iframeWidth;
+                    }
+                </style>
             HTML;
-
-            $wa->addInlineScript('
-                window.addEventListener("load", function() {
-                    const dsgvoIframeContainer = document.getElementById("dsgvo-iframe-container-'.$random.'");
-                    const button = dsgvoIframeContainer.querySelector("button");
-                    button.addEventListener("click", function(event) {
-                        event.preventDefault();
-                        const iframe = document.createElement("iframe");
-                        iframe.setAttribute("src", "'.$iframeSrc.'");
-                        iframe.style.width = "'.$iframeWidth.'";
-                        iframe.style.height = "'.$iframeHeight.'";
-                        iframe.title = "'.$iframeTitle.'";
-                        document.getElementById("dsgvo-iframe-container-'.$random.'").after(iframe);
-                        document.getElementById("dsgvo-iframe-container-'.$random.'").remove();
-                    })
-                })
-            ');
 
             $element->outertext = $replacement;
 
