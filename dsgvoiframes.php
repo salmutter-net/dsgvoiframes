@@ -58,7 +58,7 @@ class PlgContentDsgvoiframes extends JPlugin {
             'youtube',
             'x',
         ];
-        $iconFolder = JPATH_ROOT . '/plugins/content/dsgvoiframes/tmpl/icons/';
+        $iconFolder = JUri::base(false) . '/plugins/content/dsgvoiframes/tmpl/icons/';
         $html = str_get_html( $htmlString );
         foreach ( $html->find( 'iframe' ) as $element ) {
             $iconFile = 'other.svg';
