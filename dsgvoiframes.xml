@@ -6,7 +6,7 @@
     <copyright>(C) 2022 salmutter.net</copyright>
     <authorEmail>philipp@salmutter.net</authorEmail>
     <authorUrl>salmutter.net</authorUrl>
-    <version>0.5</version>
+    <version>0.5.1</version>
     <description>Makes iframes DSGVO safe</description>
     <files>
         <filename plugin="dsgvoiframes">dsgvoiframes.php</filename>
